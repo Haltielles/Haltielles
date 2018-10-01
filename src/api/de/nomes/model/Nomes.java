@@ -33,7 +33,8 @@ public class Nomes {
         for (int i = 0; i < res.size(); i++) {
             JSONObject objeto = new JSONObject();
             objeto = (JSONObject) res.get(i);
-            lista.add(new ResNomes(objeto.get("periodo").toString(),Integer.parseInt(objeto.get("frequencia").toString())));
+            lista.add(new ResNomes(objeto.get("periodo").toString(),
+                    Integer.parseInt(objeto.get("frequencia").toString())));
         }
         return lista;
     }
