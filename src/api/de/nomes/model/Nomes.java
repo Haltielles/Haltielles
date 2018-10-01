@@ -6,22 +6,36 @@
 package api.de.nomes.model;
 
 import java.util.ArrayList;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 /**
  *
  * @author khayzer
  */
 public class Nomes {
+
     private String nome;
     private String localidade;
     private String sexo;
-    private ArrayList res;
+    private ArrayList<ResNomes> res;
 
-    public Nomes(String nome, String localidade, String sexo, ArrayList res) {
+    public Nomes(String nome, String localidade, String sexo, Object res) {
         this.nome = nome;
         this.localidade = localidade;
         this.sexo = sexo;
-        this.res = res;
+        this.res = this.amontaRes((JSONArray) res);
+    }
+
+    public ArrayList amontaRes(JSONArray res) {
+        ArrayList<ResNomes> lista = new <ResNomes>ArrayList();
+        for (int i = 0; i < res.size(); i++) {
+            JSONObject objeto = new JSONObject();
+            objeto = (JSONObject) res.get(i);
+            lista.add(new ResNomes(objeto.get("periodo").toString(),Integer.parseInt(objeto.get("frequencia").toString())));
+        }
+        return lista;
     }
 
     public String getNome() {
@@ -55,6 +69,5 @@ public class Nomes {
     public void setRes(ArrayList res) {
         this.res = res;
     }
-    
-    
+
 }

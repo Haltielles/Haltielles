@@ -29,7 +29,7 @@ public class GetJson {
     boolean canConnect = false;
 
     public GetJson() throws MalformedURLException, ProtocolException, IOException {
-        this.url = new URL("https://servicodados.ibge.gov.br/api/v2/censos/nomes/joao?localidade=33");
+        this.url = new URL("https://servicodados.ibge.gov.br/api/v2/censos/nomes/joao?localidade=33?sexo=m");
         this.con = (HttpURLConnection) url.openConnection();
         this.con.setRequestMethod("GET");
         this.status = con.getResponseCode();
