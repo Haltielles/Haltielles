@@ -97,6 +97,10 @@
     <Component class="javax.swing.JTextField" name="textdecada">
     </Component>
     <Component class="javax.swing.JTextField" name="textlocalidade">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="BR"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="textsexo">
     </Component>

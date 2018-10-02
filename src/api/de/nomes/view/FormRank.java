@@ -123,6 +123,9 @@ public class FormRank extends javax.swing.JPanel {
 
         labelsexo.setText("Sexo:");
 
+        textlocalidade.setText("BR");
+        textlocalidade.setEnabled(false);
+
         botaobuscar.setText("Buscar");
         botaobuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

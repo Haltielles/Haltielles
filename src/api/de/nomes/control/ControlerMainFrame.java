@@ -16,7 +16,9 @@ import api.de.nomes.view.FormNome;
 import api.de.nomes.view.MainFrame;
 import java.io.IOException;
 import java.net.ProtocolException;
+import java.util.ArrayList;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -34,7 +36,8 @@ public class ControlerMainFrame {
     FormNome formnome;
     FormRank formrank;
     GetJson requisitor;
-    public Nomes nome;
+    ExibeGetRank dadorank;
+    public ArrayList<Nomes> nomes;
     public Ranking rank;
 
     public ControlerMainFrame() throws ProtocolException, IOException {
@@ -80,16 +83,17 @@ public class ControlerMainFrame {
         String sexo = this.formrank.getTextsexo().getText();
         String retorno = this.requisitor.dadoRank(decada, localidade, sexo);
         this.carregaJsonByRank(retorno);
-        ExibeGetRank dado = new ExibeGetRank(this);
-        this.fillFormRank(dado);
-        this.resultadoRank.add(dado);
-        this.resultadoRank.setSize(400, 350);
+        this.dadorank = new ExibeGetRank(this);
+        this.fillFormRank(this.dadorank);
+        this.resultadoRank.add(this.dadorank);
+        this.resultadoRank.setSize(400, 400);
         this.resultadoRank.setVisible(true);
         this.resultadoRank.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     }
 
     public void voltaBRank() {
-        this.resultadoRank.removeAll();
+        this.resultadoRank.remove(this.dadorank);
         this.resultadoRank.setVisible(false);
     }
 
@@ -98,13 +102,19 @@ public class ControlerMainFrame {
         String localidade = this.formnome.getTextLocalidade().getText();
         String sexo = this.formnome.getTextSexo().getText();
         String retorno = this.requisitor.dadoNome(nome, localidade, sexo);
-        this.carregaJsonByName(retorno);
-        ExibeGetNome dado = new ExibeGetNome(this);
-        this.fillFormNome(dado);
-        this.resultadoNome.add(dado);
-        this.resultadoNome.setSize(400, 350);
-        this.resultadoNome.setVisible(true);
-        this.resultadoNome.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        if (retorno.equals("erro")) {
+            JOptionPane.showMessageDialog(null, "preencha o campos nome para fazer a consulta");
+        } else {
+            this.carregaJsonByName(retorno);
+            for (int i = 0; i < nomes.size(); i++) {
+                ExibeGetNome dadonome = new ExibeGetNome(this);
+                this.fillFormNome(dadonome,i);
+                this.resultadoNome.add(dadonome);
+            }     
+            this.resultadoNome.setSize(400, 350);
+            this.resultadoNome.setVisible(true);
+            this.resultadoNome.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
     }
 
     public void voltaBNome() {
@@ -112,14 +122,14 @@ public class ControlerMainFrame {
         this.resultadoNome.setVisible(false);
     }
 
-    public void fillFormNome(ExibeGetNome form) {
-        form.getTextnome().setText(this.nome.getNome());
-        form.getTextlocalidade().setText(this.nome.getLocalidade());
-        form.getTextsexo().setText(this.nome.getSexo());
+    public void fillFormNome(ExibeGetNome form,int cont) {
+        form.getTextnome().setText(this.nomes.get(cont).getNome());
+        form.getTextlocalidade().setText(this.nomes.get(cont).getLocalidade());
+        form.getTextsexo().setText(this.nomes.get(cont).getSexo());
         DefaultTableModel modelo = (DefaultTableModel) form.getTabelares().getModel();
-        for (int i = 0; i < nome.getRes().size(); i++) {
-            modelo.addRow(new Object[]{((ResNomes) this.nome.getRes().get(i)).getPeriodo(),
-                ((ResNomes) this.nome.getRes().get(i)).getFrequencia()});
+        for (int i = 0; i < nomes.get(cont).getRes().size(); i++) {
+            modelo.addRow(new Object[]{((ResNomes) this.nomes.get(cont).getRes().get(i)).getPeriodo(),
+                ((ResNomes) this.nomes.get(cont).getRes().get(i)).getFrequencia()});
         }
         form.getTabelares().setModel(modelo);
     }
@@ -141,17 +151,19 @@ public class ControlerMainFrame {
         JSONArray jsonarray = new JSONArray();
         JSONParser parser = new JSONParser();
         jsonarray = (JSONArray) parser.parse(json);
-        objeto = (JSONObject) jsonarray.get(0);
-        //parte onde pega o json e joga os dados dentro dos objetos
-        String sexo = new String();
-        if (objeto.get("sexo") == null) {
-            sexo = "ambos";
-        } else {
-            sexo = objeto.get("sexo").toString();
+        for (int i = 0; i < jsonarray.size(); i++) {
+            objeto = (JSONObject) jsonarray.get(i);
+            //parte onde pega o json e joga os dados dentro dos objetos
+            String sexo = new String();
+            if (objeto.get("sexo") == null) {
+                sexo = "ambos";
+            } else {
+                sexo = objeto.get("sexo").toString();
+            }
+            this.nomes.add(new Nomes(objeto.get("nome").toString(),
+                    objeto.get("localidade").toString(),
+                    sexo, objeto.get("res")));
         }
-        this.nome = new Nomes(objeto.get("nome").toString(),
-                objeto.get("localidade").toString(),
-                sexo, objeto.get("res"));
     }
 
     public void carregaJsonByRank(String json) throws ProtocolException, IOException, ParseException {
@@ -171,15 +183,16 @@ public class ControlerMainFrame {
                 sexo,
                 objeto.get("res"));
     }
+
     //-------------sua parte ju fica daqui pra baixo-----------------------//
-    //voce pode manipular direto o nome e o rank pra pegar os dados que neste
+    //voce pode manipular direto o nomes e o rank pra pegar os dados que neste
     //ponto eles já vão estar carregados
     //conexão com o banco de dados e insert tabelas
-    public void saveNome(){
-        
+    public void saveNome() {
+
     }
-    
-    public void saveRank(){
-        
+
+    public void saveRank() {
+
     }
 }

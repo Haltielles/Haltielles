@@ -28,34 +28,59 @@ public class GetJson {
     private JSONArray lista;
     boolean canConnect = false;
     private static final String path = "https://servicodados.ibge.gov.br/api/v2/censos/nomes/";
-    String filtro=path;
-    
-    public String dadoRank(String decada,String localidade,String sexo) throws ProtocolException, IOException{
-        if(!decada.isEmpty()){
-            filtro+="ranking/?decada="+decada;
-        }else if(!localidade.isEmpty()){
-            filtro+="ranking/?localidade="+localidade;
-        }else if(!sexo.isEmpty()){
-            filtro+="ranking/?sexo="+sexo;
-        }else{
-            return "erro";
+    String filtro = path;
+
+    public String dadoRank(String decada, String localidade, String sexo) throws ProtocolException, IOException {
+        //com tres campos
+        if (!decada.isEmpty() && !localidade.isEmpty() && !sexo.isEmpty()) {
+            filtro += "ranking?decada=" + decada + "&localidade=" + localidade + "&sexo=" + sexo;
+        } else {
+            //com dois campos
+            if (!decada.isEmpty() && !localidade.isEmpty()) {
+                filtro += "rnaking?decada=" + decada + "&localidade=" + localidade;
+            } else if (!decada.isEmpty() && !sexo.isEmpty()) {
+                //possui um bug na API que faz a consulta corretamente mas o campo sexo fica como null
+                filtro += "ranking?decada=" + decada + "&sexo=" + sexo;
+            } else if (!localidade.isEmpty() && !sexo.isEmpty()) {
+                filtro += "ranking?localidade=" + localidade + "&sexo=" + sexo;
+            } else {
+                //com apenas um campo
+                if (!decada.isEmpty()) {
+                    filtro += "ranking/?decada=" + decada;
+                } else if (!localidade.isEmpty()) {
+                    filtro += "ranking/?localidade=" + localidade;
+                } else if (!sexo.isEmpty()) {
+                    filtro += "ranking/?sexo=" + sexo;
+                } else {
+                    filtro += "ranking";
+                }
+            }
         }
         return this.getJson();
     }
-    
-    public String dadoNome(String nome,String localidade,String sexo) throws ProtocolException, IOException{
-        if(!nome.isEmpty()){
-            filtro+=nome;
-        }else if(!localidade.isEmpty()){
-            filtro+=nome+"?localidade="+localidade;
-        }else if(!sexo.isEmpty()){
-            filtro+=nome+"?sexo="+sexo;
-        }else{
-            return "erro";
+
+    public String dadoNome(String nome, String localidade, String sexo) throws ProtocolException, IOException {
+        //com tres campos
+        if (!nome.isEmpty() && !localidade.isEmpty() && !sexo.isEmpty()) {
+            filtro += nome + "?localidade=" + localidade + "&sexo=" + sexo;
+        } else {
+            //com dois campos
+            if (!nome.isEmpty() && !localidade.isEmpty()) {
+                filtro += nome + "?localidade=" + localidade;
+            } else if (!nome.isEmpty() && !sexo.isEmpty()) {
+                filtro += nome + "?sexo=" + sexo;
+            } else {
+                //com apenas um campo
+                if (!nome.isEmpty()) {
+                    filtro += nome;
+                } else {
+                    return "erro";
+                }
+            }
         }
         return this.getJson();
     }
-   
+
     public String getJson() throws MalformedURLException, ProtocolException, IOException {
         this.url = new URL(filtro);
         this.con = (HttpURLConnection) url.openConnection();
@@ -74,7 +99,7 @@ public class GetJson {
             content.append(inputline);
         }
         in.close();
-        filtro=path;
+        filtro = path;
         return content.toString();
     }
 }
