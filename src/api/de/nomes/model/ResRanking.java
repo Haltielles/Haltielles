@@ -12,12 +12,12 @@ package api.de.nomes.model;
 public class ResRanking {
     private String nome;
     private int frequencia;
-    private int ranquing;
+    private int ranking;
 
     public ResRanking(String nome, int frequencia, int ranquing) {
         this.nome = nome;
         this.frequencia = frequencia;
-        this.ranquing = ranquing;
+        this.ranking = ranquing;
     }
 
     public String getNome() {
@@ -36,12 +36,12 @@ public class ResRanking {
         this.frequencia = frequencia;
     }
 
-    public int getRanquing() {
-        return ranquing;
+    public int getRanking() {
+        return ranking;
     }
 
-    public void setRanquing(int ranquing) {
-        this.ranquing = ranquing;
+    public void setRanking(int ranquing) {
+        this.ranking = ranquing;
     }
     
     

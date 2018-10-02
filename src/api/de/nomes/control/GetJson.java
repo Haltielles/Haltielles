@@ -27,9 +27,37 @@ public class GetJson {
     private String dado;
     private JSONArray lista;
     boolean canConnect = false;
-
-    public GetJson() throws MalformedURLException, ProtocolException, IOException {
-        this.url = new URL("https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking?localidade=3300100");
+    private static final String path = "https://servicodados.ibge.gov.br/api/v2/censos/nomes/";
+    String filtro=path;
+    
+    public String dadoRank(String decada,String localidade,String sexo) throws ProtocolException, IOException{
+        if(!decada.isEmpty()){
+            filtro+="ranking/?decada="+decada;
+        }else if(!localidade.isEmpty()){
+            filtro+="ranking/?localidade="+localidade;
+        }else if(!sexo.isEmpty()){
+            filtro+="ranking/?sexo="+sexo;
+        }else{
+            return "erro";
+        }
+        return this.getJson();
+    }
+    
+    public String dadoNome(String nome,String localidade,String sexo) throws ProtocolException, IOException{
+        if(!nome.isEmpty()){
+            filtro+=nome;
+        }else if(!localidade.isEmpty()){
+            filtro+=nome+"?localidade="+localidade;
+        }else if(!sexo.isEmpty()){
+            filtro+=nome+"?sexo="+sexo;
+        }else{
+            return "erro";
+        }
+        return this.getJson();
+    }
+   
+    public String getJson() throws MalformedURLException, ProtocolException, IOException {
+        this.url = new URL(filtro);
         this.con = (HttpURLConnection) url.openConnection();
         this.con.setRequestMethod("GET");
         this.status = con.getResponseCode();
@@ -41,78 +69,12 @@ public class GetJson {
         this.dados = new JSONObject();
         this.content = new StringBuffer();
         this.lista = new JSONArray();
-    }
-
-    public StringBuffer getdatafromapi() throws IOException, ParseException {
         String inputline;
         while ((inputline = in.readLine()) != null) {
             content.append(inputline);
         }
-        return content;
+        in.close();
+        filtro=path;
+        return content.toString();
     }
-
-    public URL getUrl() {
-        return url;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
-    public HttpURLConnection getCon() {
-        return con;
-    }
-
-    public void setCon(HttpURLConnection con) {
-        this.con = con;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public BufferedReader getIn() {
-        return in;
-    }
-
-    public void setIn(BufferedReader in) {
-        this.in = in;
-    }
-
-    public StringBuffer getContent() {
-        return content;
-    }
-
-    public void setContent(StringBuffer content) {
-        this.content = content;
-    }
-
-    public JSONObject getDados() {
-        return dados;
-    }
-
-    public void setDados(JSONObject dados) {
-        this.dados = dados;
-    }
-
-    public String getDado() {
-        return dado;
-    }
-
-    public void setDado(String dado) {
-        this.dado = dado;
-    }
-
-    public JSONArray getLista() {
-        return lista;
-    }
-
-    public void setLista(JSONArray lista) {
-        this.lista = lista;
-    }
-
 }

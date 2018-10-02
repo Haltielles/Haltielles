@@ -20,6 +20,7 @@ public class MainFrame {
         this.mainframe = new JFrame();
         this.mainframe.setVisible(true);
         this.mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.mainframe.setSize(200, 130);
     }
 
     public JFrame getMainframe() {
