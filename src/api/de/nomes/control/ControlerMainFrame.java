@@ -9,11 +9,13 @@ import api.de.nomes.model.Nomes;
 import api.de.nomes.model.Ranking;
 import api.de.nomes.model.ResNomes;
 import api.de.nomes.model.ResRanking;
+import api.de.nomes.view.Botoes;
 import api.de.nomes.view.ExibeGetNome;
 import api.de.nomes.view.ExibeGetRank;
 import api.de.nomes.view.FormRank;
 import api.de.nomes.view.FormNome;
 import api.de.nomes.view.MainFrame;
+import java.awt.FlowLayout;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.ArrayList;
@@ -32,15 +34,22 @@ import org.json.simple.parser.ParseException;
 public class ControlerMainFrame {
 
     public MainFrame frame;
-    JFrame janela1, janela2, resultadoNome, resultadoRank;
-    FormNome formnome;
-    FormRank formrank;
-    GetJson requisitor;
-    ExibeGetRank dadorank;
+    public JFrame janela1, janela2, resultadoNome, resultadoRank;
+    public FormNome formnome;
+    public FormRank formrank;
+    public GetJson requisitor;
+    public ExibeGetRank dadorank;
+    public FlowLayout layout;
+    public Botoes botoes;
+    public ArrayList<ExibeGetNome> nomesExibe;
     public ArrayList<Nomes> nomes;
     public Ranking rank;
 
     public ControlerMainFrame() throws ProtocolException, IOException {
+        this.botoes = new Botoes(this);
+        this.layout = new FlowLayout();
+        this.nomesExibe = new ArrayList();
+        this.nomes = new ArrayList();
         this.janela1 = new JFrame();
         this.janela2 = new JFrame();
         this.resultadoNome = new JFrame();
@@ -105,24 +114,29 @@ public class ControlerMainFrame {
         if (retorno.equals("erro")) {
             JOptionPane.showMessageDialog(null, "preencha o campos nome para fazer a consulta");
         } else {
+            this.resultadoNome.setLayout(layout);
             this.carregaJsonByName(retorno);
             for (int i = 0; i < nomes.size(); i++) {
-                ExibeGetNome dadonome = new ExibeGetNome(this);
-                this.fillFormNome(dadonome,i);
-                this.resultadoNome.add(dadonome);
-            }     
-            this.resultadoNome.setSize(400, 350);
+                this.nomesExibe.add(new ExibeGetNome(this));
+                this.fillFormNome((ExibeGetNome) this.nomesExibe.get(i), i);
+                this.resultadoNome.add(this.nomesExibe.get(i));
+            }
+            this.resultadoNome.add(this.botoes);
+            this.resultadoNome.setSize(420, 350 * this.nomes.size());
             this.resultadoNome.setVisible(true);
             this.resultadoNome.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
     }
 
     public void voltaBNome() {
-        this.resultadoNome.removeAll();
+        this.resultadoNome.remove(botoes);
+        for (int i = 0; i < nomes.size(); i++) {
+            this.resultadoNome.remove(this.nomesExibe.get(i));
+        }
         this.resultadoNome.setVisible(false);
     }
 
-    public void fillFormNome(ExibeGetNome form,int cont) {
+    public void fillFormNome(ExibeGetNome form, int cont) {
         form.getTextnome().setText(this.nomes.get(cont).getNome());
         form.getTextlocalidade().setText(this.nomes.get(cont).getLocalidade());
         form.getTextsexo().setText(this.nomes.get(cont).getSexo());
@@ -162,7 +176,8 @@ public class ControlerMainFrame {
             }
             this.nomes.add(new Nomes(objeto.get("nome").toString(),
                     objeto.get("localidade").toString(),
-                    sexo, objeto.get("res")));
+                    sexo,
+                    objeto.get("res")));
         }
     }
 
